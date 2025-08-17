@@ -408,16 +408,49 @@ python api.py
 uvicorn api:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
-### Docker (example)
-```dockerfile
-FROM python:3.9-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 8000
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
+### 🎯 Render Deployment (Recommended)
+
+#### Option 1: Using render.yaml (Easiest)
+1. **Connect your GitHub repository to Render**
+2. **Render will automatically detect the `render.yaml` file**
+3. **Your app will be deployed automatically**
+
+#### Option 2: Manual Setup
+1. **Create a new Web Service on Render**
+2. **Connect your GitHub repository**
+3. **Set build command**: `pip install -r requirements.txt`
+4. **Set start command**: `uvicorn api:app --host 0.0.0.0 --port $PORT`
+5. **Set environment variables**:
+   - `PORT`: 8000
+   - `LOG_LEVEL`: INFO
+   - `DEBUG`: false
+
+#### Environment Variables for Render
+```bash
+# Required
+PORT=8000
+
+# Optional
+LOG_LEVEL=INFO
+DEBUG=false
+RELOAD=false
+HF_TOKEN=your_huggingface_token_here
+OPENAI_API_KEY=your_openai_api_key_here
 ```
+
+### 🐳 Docker Deployment
+```bash
+# Build the image
+docker build -t ai-code-review-assistant .
+
+# Run the container
+docker run -p 8000:8000 ai-code-review-assistant
+```
+
+### 📦 Other Platforms
+- **Heroku**: Use the `Procfile`
+- **Railway**: Use the `Dockerfile`
+- **DigitalOcean App Platform**: Use the `Dockerfile`
 
 ## 🤝 Contributing
 

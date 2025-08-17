@@ -919,5 +919,10 @@ def calculate_overall_summary(results: Dict[str, Any]) -> Dict[str, Any]:
 
 if __name__ == "__main__":
     import uvicorn
-    logger.info("Starting Static Code Analysis API server...")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+    
+    # Get port from environment variable (for Render deployment)
+    port = int(os.environ.get("PORT", 8000))
+    
+    logger.info(f"Starting Static Code Analysis API server on port {port}...")
+    uvicorn.run(app, host="0.0.0.0", port=port)
