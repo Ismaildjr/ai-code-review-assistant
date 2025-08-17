@@ -1,0 +1,858 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Review Report - Python Code</title>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8fafc;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .company-logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .company-logo i {
+            font-size: 40px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .report-meta {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: -20px 20px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+        }
+        
+        .meta-item i {
+            color: #667eea;
+        }
+        
+        /* Executive Summary */
+        .executive-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-left: 4px solid #667eea;
+        }
+        
+        .summary-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .summary-header i {
+            font-size: 2rem;
+            color: #667eea;
+        }
+        
+        .summary-header h2 {
+            font-size: 1.8rem;
+            color: #2d3748;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .metric-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .severity-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .severity-critical { background: #fed7d7; color: #c53030; }
+        .severity-high { background: #feb2b2; color: #c05621; }
+        .severity-medium { background: #fef5e7; color: #d69e2e; }
+        .severity-low { background: #f0fff4; color: #38a169; }
+        
+        /* Code Section */
+        .code-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .code-header h3 {
+            font-size: 1.5rem;
+            color: #2d3748;
+        }
+        
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background: #5a67d8;
+        }
+        
+        .code-block {
+            background: #1a202c;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .code-block pre {
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        /* Analysis Results */
+        .analysis-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .section-header i {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+        
+        .section-header h3 {
+            font-size: 1.5rem;
+            color: #2d3748;
+        }
+        
+        .tool-results {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .tool-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .tool-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1.1rem;
+        }
+        
+        .tool-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-success { background: #f0fff4; color: #38a169; }
+        .status-error { background: #fed7d7; color: #c53030; }
+        
+        .issue-list {
+            list-style: none;
+        }
+        
+        .issue-item {
+            background: white;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 3px solid #e2e8f0;
+            transition: border-color 0.2s;
+        }
+        
+        .issue-item:hover {
+            border-left-color: #667eea;
+        }
+        
+        .issue-severity {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        /* AI Review Section */
+        .ai-review-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ai-review-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="ai-pattern" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23ai-pattern)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .ai-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .ai-header i {
+            font-size: 2rem;
+            color: white;
+        }
+        
+        .ai-header h3 {
+            font-size: 1.8rem;
+            color: white;
+        }
+        
+        .ai-review-content {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+        
+        /* Recommendations */
+        .recommendations-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .recommendation-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .recommendation-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #48bb78;
+        }
+        
+        .recommendation-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .recommendation-header i {
+            color: #48bb78;
+            font-size: 1.2rem;
+        }
+        
+        .recommendation-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .footer-left {
+            text-align: left;
+        }
+        
+        .footer-right {
+            text-align: right;
+        }
+        
+        .footer h4 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .report-meta {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .header, .footer {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            
+            .code-block {
+                background: #f8f9fa !important;
+                color: #333 !important;
+            }
+        }
+        
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+        <div class="header">
+            <div class="header-content">
+                <div class="company-logo"><i class="fas fa-code"></i></div>
+                <h1>Code Review Report</h1>
+                <p>Professional analysis and AI-powered insights</p>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="report-meta">
+                <div class="meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Generated: August 17, 2025 at 04:09 PM</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-fingerprint"></i>
+                    <span>Report ID: 1db4a4f2</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-building"></i>
+                    <span>CodeReview Pro</span>
+                </div>
+            </div>
+        </div>
+        
+    
+        <div class="container">
+            <div class="executive-summary">
+                <div class="summary-header">
+                    <i class="fas fa-chart-line"></i>
+                    <h2>Executive Summary</h2>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">Total Issues</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">Security Issues</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">Style Issues</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">Complexity Issues</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <span class="severity-indicator severity-low">
+                        Overall Risk Level: LOW
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+    
+        <div class="container">
+            <div class="code-section">
+                <div class="code-header">
+                    <h3><i class="fas fa-code"></i> Analyzed Code</h3>
+                    <button class="copy-btn" onclick="copyCode()">
+                        <i class="fas fa-copy"></i> Copy Code
+                    </button>
+                </div>
+                <div class="code-block">
+                    <pre><code id="code-content">import os
+import subprocess
+
+def calculate_sum(a, b):
+    """Calculate sum of two numbers."""
+    result = a + b
+    return result
+
+def very_long_function(a,b,c,d,e,f,g,h,i,j):
+    """Function with too many parameters."""
+    print("This function has too many parameters")
+    temp_result = 0
+    for param in [a,b,c,d,e,f,g,h,i,j]:
+        temp_result += param
+    return temp_result
+
+def unsafe_function():
+    """Function with security vulnerabilities."""
+    user_input = input("Enter command: ")
+    
+    # Security issue: os.system with user input
+    os.system(user_input)  # B101: use of os.system
+    
+    # Security issue: unsafe file permissions
+    os.chmod("/tmp/file", 0o777)  # B103: use of set_bad_file_permissions
+    
+    return "unsafe"</code></pre>
+                </div>
+                <div style="margin-top: 15px; color: #666; font-size: 0.9rem;">
+                    <i class="fas fa-file-code"></i> File: Python Code
+                </div>
+            </div>
+        </div>
+        
+    
+        <div class="container">
+            <div class="analysis-section">
+                <div class="section-header">
+                    <i class="fas fa-microscope"></i>
+                    <h3>Detailed Analysis Results</h3>
+                </div>
+                <div class="tool-results">
+                    
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">
+                            <i class="fas fa-search"></i> PYLINT
+                        </div>
+                        <span class="tool-status status-success">SUCCESS</span>
+                    </div>
+                    <div style="color: #666; padding: 10px;"><i class="fas fa-info-circle"></i> Analysis completed</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">
+                            <i class="fas fa-check-double"></i> FLAKE8
+                        </div>
+                        <span class="tool-status status-success">SUCCESS</span>
+                    </div>
+                    <div style="color: #666; padding: 10px;"><i class="fas fa-info-circle"></i> Analysis completed</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">
+                            <i class="fas fa-chart-line"></i> RADON
+                        </div>
+                        <span class="tool-status status-success">SUCCESS</span>
+                    </div>
+                    <div style="padding: 10px; background: #f1f5f9; border-radius: 4px;">Total Functions: 3</div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-name">
+                            <i class="fas fa-shield-alt"></i> BANDIT
+                        </div>
+                        <span class="tool-status status-success">SUCCESS</span>
+                    </div>
+                    <div style="color: #38a169; padding: 10px;"><i class="fas fa-check-circle"></i> No security issues found</div>
+                </div>
+                
+                </div>
+            </div>
+        </div>
+        
+    
+        <div class="container">
+            <div class="ai-review-section">
+                <div class="ai-content">
+                    <div class="ai-header">
+                        <i class="fas fa-robot"></i>
+                        <h3>AI-Powered Code Review</h3>
+                    </div>
+                    <div class="ai-review-content">
+                        <strong style="color: white; font-weight: 600;">Code Review Report</strong>
+<hr style="border: none; border-top: 1px solid rgba(255,255,255,0.3); margin: 20px 0;">
+<br>
+<h4 style="margin: 20px 0 10px 0; color: white; font-size: 1.2rem;">Bugs and Errors</h4>
+<br>
+<p style="margin: 10px 0; line-height: 1.6;">The provided code does not contain any syntax errors or bugs that would prevent it from running. However, there are some logical issues and potential improvements that can be suggested:</p>
+<br>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">The `very_long_function` takes 10 parameters, which can be reduced by using a variable number of arguments (`*args`) or by passing a list of numbers.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">The `unsafe_function` uses `os.system` with user input, which can lead to security vulnerabilities. It also sets unsafe file permissions using `os.chmod`.</li></ul>
+<br>
+<h4 style="margin: 20px 0 10px 0; color: white; font-size: 1.2rem;">Code Style Issues</h4>
+<br>
+<p style="margin: 10px 0; line-height: 1.6;">The code has some style issues that can be improved:</p>
+<br>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">The `very_long_function` has a long name and takes too many parameters. It can be renamed to something more descriptive and use a variable number of arguments.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">The `unsafe_function` has a misleading name and does not follow the principle of least surprise. It can be renamed to something more descriptive and follow best practices for security.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">The code uses inconsistent spacing and indentation. It's recommended to use a consistent number of spaces for indentation (4 spaces is the standard in Python).</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">The code does not follow PEP 8, the official Python style guide. It's recommended to use a linter like pylint or flake8 to check for style issues.</li></ul>
+<br>
+<h4 style="margin: 20px 0 10px 0; color: white; font-size: 1.2rem;">Security Vulnerabilities</h4>
+<br>
+<p style="margin: 10px 0; line-height: 1.6;">The code has two critical security vulnerabilities:</p>
+<br>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">**Use of `os.system` with user input**: The `unsafe_function` uses `os.system` with user input, which can lead to arbitrary command execution. This is a critical security vulnerability that can be exploited by an attacker to execute malicious commands.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">**Unsafe file permissions**: The `unsafe_function` sets the permissions of a file to `0o777`, which allows anyone to read, write, and execute the file. This can lead to unauthorized access to sensitive data.</li></ul>
+<br>
+<h4 style="margin: 20px 0 10px 0; color: white; font-size: 1.2rem;">Suggestions for Improvement</h4>
+<br>
+<p style="margin: 10px 0; line-height: 1.6;">Here are some suggestions for improvement:</p>
+<br>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Use a variable number of arguments (`*args`) instead of a long list of parameters:</li></ul>
+<pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin: 15px 0; overflow-x: auto;"><code style="color: white; font-family: monospace;">
+<p style="margin: 10px 0; line-height: 1.6;">def calculate_sum(*numbers):</p>
+<p style="margin: 10px 0; line-height: 1.6;">"""Calculate sum of numbers."""</p>
+<p style="margin: 10px 0; line-height: 1.6;">return sum(numbers)</p>
+<pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin: 15px 0; overflow-x: auto;"><code style="color: white; font-family: monospace;">
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Use a more descriptive name for the `very_long_function` and reduce the number of parameters:</li></ul>
+<pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin: 15px 0; overflow-x: auto;"><code style="color: white; font-family: monospace;">
+<p style="margin: 10px 0; line-height: 1.6;">def calculate_total(*numbers):</p>
+<p style="margin: 10px 0; line-height: 1.6;">"""Calculate total of numbers."""</p>
+<p style="margin: 10px 0; line-height: 1.6;">return sum(numbers)</p>
+<pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin: 15px 0; overflow-x: auto;"><code style="color: white; font-family: monospace;">
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Avoid using `os.system` with user input and use a safer alternative like `subprocess.run`:</li></ul>
+<pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin: 15px 0; overflow-x: auto;"><code style="color: white; font-family: monospace;">
+<p style="margin: 10px 0; line-height: 1.6;">import subprocess</p>
+<br>
+<p style="margin: 10px 0; line-height: 1.6;">def safe_function():</p>
+<p style="margin: 10px 0; line-height: 1.6;">"""Safe function with no security vulnerabilities."""</p>
+<p style="margin: 10px 0; line-height: 1.6;">user_input = input("Enter command: ")</p>
+<p style="margin: 10px 0; line-height: 1.6;">try:</p>
+<p style="margin: 10px 0; line-height: 1.6;">subprocess.run(user_input, shell=True, check=True)</p>
+<p style="margin: 10px 0; line-height: 1.6;">except subprocess.CalledProcessError as e:</p>
+<p style="margin: 10px 0; line-height: 1.6;">print(f"Error: {e}")</p>
+<pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin: 15px 0; overflow-x: auto;"><code style="color: white; font-family: monospace;">
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Avoid setting unsafe file permissions and use a safer alternative like `os.chmod` with a more restrictive permission:</li></ul>
+<pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin: 15px 0; overflow-x: auto;"><code style="color: white; font-family: monospace;">
+<p style="margin: 10px 0; line-height: 1.6;">import os</p>
+<br>
+<p style="margin: 10px 0; line-height: 1.6;">def safe_function():</p>
+<p style="margin: 10px 0; line-height: 1.6;">"""Safe function with no security vulnerabilities."""</p>
+<p style="margin: 10px 0; line-height: 1.6;">os.chmod("/tmp/file", 0o600)  # Set permissions to read and write for owner only</p>
+<pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin: 15px 0; overflow-x: auto;"><code style="color: white; font-family: monospace;">
+<br>
+<h4 style="margin: 20px 0 10px 0; color: white; font-size: 1.2rem;">Prioritized Issues</h4>
+<br>
+<p style="margin: 10px 0; line-height: 1.6;">Here are the issues prioritized by severity:</p>
+<br>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">**Critical**: Use of `os.system` with user input (security vulnerability)</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">**Critical**: Unsafe file permissions (security vulnerability)</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">**High**: Long function with too many parameters (code style issue)</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">**Medium**: Inconsistent spacing and indentation (code style issue)</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">**Low**: Misleading function name (code style issue)</li></ul>
+<br>
+<h4 style="margin: 20px 0 10px 0; color: white; font-size: 1.2rem;">Actionable Next Steps</h4>
+<br>
+<p style="margin: 10px 0; line-height: 1.6;">Here are the actionable next steps for the developer:</p>
+<br>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">**Fix the critical security vulnerabilities**:</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Replace `os.system` with `subprocess.run` and avoid using user input.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Set safe file permissions using `os.chmod` with a more restrictive permission.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">**Improve code style**:</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Rename functions to be more descriptive.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Reduce the number of parameters in long functions.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Use consistent spacing and indentation.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">**Follow best practices and coding standards**:</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Use a linter like pylint or flake8 to check for style issues.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Follow PEP 8, the official Python style guide.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">**Test and verify**:</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Test the code to ensure it works as expected.</li></ul>
+<ul style="margin: 15px 0; padding-left: 20px;"><li style="margin: 5px 0; padding-left: 10px;">Verify that the security vulnerabilities have been fixed.</li></ul>
+<br>
+<p style="margin: 10px 0; line-height: 1.6;">By following these steps, the developer can improve the code quality, fix security vulnerabilities, and make the code more maintainable and efficient.</p>
+                    </div>
+                    <div style="margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">
+                        <i class="fas fa-brain"></i> Powered by HUGGINGFACE | 
+                        <i class="fas fa-clock"></i> Generated in 7152ms
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    
+        <div class="container">
+            <div class="recommendations-section">
+                <div class="section-header">
+                    <i class="fas fa-lightbulb"></i>
+                    <h3>Recommendations & Next Steps</h3>
+                </div>
+                <div class="recommendation-grid">
+                    
+            <div class="recommendation-card">
+                <div class="recommendation-header">
+                    <i class="fas fa-thumbs-up"></i>
+                    <span class="recommendation-title">Code Quality</span>
+                </div>
+                <p>Your code meets most quality standards. Keep up the good work!</p>
+            </div>
+            
+            <div class="recommendation-card">
+                <div class="recommendation-header">
+                    <i class="fas fa-rocket"></i>
+                    <span class="recommendation-title">Next Steps</span>
+                </div>
+                <p>Consider adding unit tests, documentation, and performance monitoring</p>
+            </div>
+            
+            <div class="recommendation-card">
+                <div class="recommendation-header">
+                    <i class="fas fa-users"></i>
+                    <span class="recommendation-title">Team Collaboration</span>
+                </div>
+                <p>Share this report with your team and establish code review processes</p>
+            </div>
+            
+                </div>
+            </div>
+        </div>
+        
+    
+        <div class="container">
+            <div class="footer">
+                <div class="footer-content">
+                    <div class="footer-left">
+                        <h4>Generated by CodeReview Pro</h4>
+                        <p>Professional code review and analysis services</p>
+                    </div>
+                    <div class="footer-right">
+                        <h4>Report Information</h4>
+                        <p>Report ID: 1db4a4f2</p>
+                        <p>Generated: August 17, 2025</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    
+    <script>
+        
+        function copyCode() {
+            const codeElement = document.getElementById('code-content');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            const btn = event.target.closest('.copy-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.style.background = '#48bb78';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = '#667eea';
+            }, 2000);
+        }
+        
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Add print functionality
+        function printReport() {
+            window.print();
+        }
+        
+    </script>
+</body>
+</html>
+        

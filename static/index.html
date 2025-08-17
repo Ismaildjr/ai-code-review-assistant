@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Code Review Assistant</title>
+    
+    <!-- CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        /* Input Section */
+        .input-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #667eea;
+        }
+        
+        /* Code Input */
+        .code-input-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .code-input {
+            width: 100%;
+            min-height: 300px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        .code-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .code-input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .filename-input {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 200px;
+        }
+        
+        .sample-code-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .sample-code-btn:hover {
+            background: #5a67d8;
+        }
+        
+        /* Tool Selection */
+        .tools-section {
+            margin-bottom: 20px;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .tool-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tool-checkbox:hover {
+            background: #edf2f7;
+            border-color: #667eea;
+        }
+        
+        .tool-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+        
+        .tool-checkbox label {
+            font-weight: 500;
+            color: #2d3748;
+            cursor: pointer;
+        }
+        
+        /* Company Branding */
+        .branding-section {
+            margin-bottom: 20px;
+        }
+        
+        .branding-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .branding-input {
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Results Section */
+        .results-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .results-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .status-loading {
+            background: #fef5e7;
+            color: #d69e2e;
+        }
+        
+        .status-success {
+            background: #f0fff4;
+            color: #38a169;
+        }
+        
+        .status-error {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #667eea;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Results Content */
+        .results-content {
+            display: none;
+        }
+        
+        .results-content.show {
+            display: block;
+        }
+        
+        .result-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .result-title {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1.1rem;
+        }
+        
+        .result-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-success { background: #f0fff4; color: #38a169; }
+        .status-error { background: #fed7d7; color: #c53030; }
+        
+        /* Download Section */
+        .download-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .download-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .download-btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .download-btn:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
+        }
+        
+        .download-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .branding-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .download-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        /* Success Message */
+        .success-message {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #22543d;
+            display: none;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .success-message h3 {
+            color: #38a169;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> AI Code Review Assistant</h1>
+            <p>Professional code analysis with AI-powered insights</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Input Section -->
+            <div class="input-section">
+                <div class="section-title">
+                    <i class="fas fa-code"></i>
+                    Code Input
+                </div>
+                
+                <div class="code-input-header">
+                    <input type="text" class="filename-input" placeholder="filename.py (optional)" id="filename">
+                    <button class="sample-code-btn" onclick="loadSampleCode()">
+                        <i class="fas fa-download"></i> Load Sample
+                    </button>
+                </div>
+                
+                <div class="code-input-container">
+                    <textarea class="code-input" id="codeInput" placeholder="Paste your Python code here..."></textarea>
+                </div>
+                
+                <!-- Tool Selection -->
+                <div class="tools-section">
+                    <div class="section-title">
+                        <i class="fas fa-tools"></i>
+                        Analysis Tools
+                    </div>
+                    <div class="tools-grid">
+                        <div class="tool-checkbox">
+                            <input type="checkbox" id="pylint" checked>
+                            <label for="pylint">Pylint (Code Quality)</label>
+                        </div>
+                        <div class="tool-checkbox">
+                            <input type="checkbox" id="flake8" checked>
+                            <label for="flake8">Flake8 (Style)</label>
+                        </div>
+                        <div class="tool-checkbox">
+                            <input type="checkbox" id="radon" checked>
+                            <label for="radon">Radon (Complexity)</label>
+                        </div>
+                        <div class="tool-checkbox">
+                            <input type="checkbox" id="bandit" checked>
+                            <label for="bandit">Bandit (Security)</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Company Branding -->
+                <div class="branding-section">
+                    <div class="section-title">
+                        <i class="fas fa-building"></i>
+                        Company Branding
+                    </div>
+                    <div class="branding-grid">
+                        <input type="text" class="branding-input" id="companyName" placeholder="Company Name" value="CodeReview Pro">
+                        <input type="text" class="branding-input" id="logoUrl" placeholder="Logo URL (optional)">
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="analyzeCode()" id="analyzeBtn">
+                        <i class="fas fa-search"></i> Analyze Code
+                    </button>
+                    <button class="btn btn-secondary" onclick="generateReport()" id="reportBtn" disabled>
+                        <i class="fas fa-file-alt"></i> Generate Report
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="results-section">
+                <div class="results-header">
+                    <div class="results-title">Analysis Results</div>
+                    <div class="status-indicator" id="statusIndicator">
+                        <i class="fas fa-info-circle"></i>
+                        Ready
+                    </div>
+                </div>
+                
+                <div class="loading" id="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <span>Analyzing your code...</span>
+                </div>
+                
+                <div class="success-message" id="successMessage">
+                    <h3><i class="fas fa-check-circle"></i> Analysis Complete!</h3>
+                    <p>Your code has been analyzed successfully. You can now generate a professional report.</p>
+                </div>
+                
+                <div class="results-content" id="resultsContent">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Download Section -->
+        <div class="download-section" id="downloadSection" style="display: none;">
+            <div class="section-title">
+                <i class="fas fa-download"></i>
+                Download Reports
+            </div>
+            <p>Choose your preferred format for the analysis results</p>
+            
+            <div class="download-buttons">
+                <button class="download-btn" onclick="downloadHTMLReport()">
+                    <i class="fas fa-file-code"></i> HTML Report
+                </button>
+                <button class="download-btn" onclick="downloadJSONReport()">
+                    <i class="fas fa-file-code"></i> JSON Data
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
