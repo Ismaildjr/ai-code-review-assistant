@@ -1,7 +1,8 @@
 // AI Code Review Assistant - Frontend Application
 class CodeReviewApp {
     constructor() {
-        this.apiBaseUrl = 'http://localhost:8000';
+        // Auto-detect the current domain for production deployment
+        this.apiBaseUrl = window.location.origin;
         this.analysisResults = null;
         this.initializeEventListeners();
     }
