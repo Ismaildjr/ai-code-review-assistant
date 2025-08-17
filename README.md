@@ -46,6 +46,11 @@ python api.py
 
 The server will start on `http://localhost:8000`
 
+**Access Points:**
+- **Main UI**: `http://localhost:8000/ui`
+- **API Docs**: `http://localhost:8000/docs`
+- **Root**: `http://localhost:8000/` (redirects to UI)
+
 ### Test the API
 
 ```bash
@@ -64,6 +69,8 @@ pytest test_api.py -v
 ```
 http://localhost:8000
 ```
+
+**Main UI**: `http://localhost:8000/ui`
 
 ### Endpoints
 

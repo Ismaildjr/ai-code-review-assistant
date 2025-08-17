@@ -102,11 +102,80 @@ async def root():
 
 @app.get("/ui")
 async def web_ui():
-    """Serve the web UI."""
+    """Serve the main web UI."""
     try:
         return FileResponse("static/index.html")
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Web UI not found. Please ensure static/index.html exists.")
+
+@app.get("/")
+async def root():
+    """Redirect root to UI with a welcome message."""
+    from fastapi.responses import HTMLResponse
+    
+    welcome_html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>AI Code Review Assistant</title>
+        <style>
+            body { 
+                font-family: Arial, sans-serif; 
+                text-align: center; 
+                padding: 50px; 
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0;
+            }
+            .container { 
+                background: rgba(255,255,255,0.1); 
+                padding: 40px; 
+                border-radius: 20px; 
+                backdrop-filter: blur(10px);
+            }
+            h1 { font-size: 2.5rem; margin-bottom: 20px; }
+            p { font-size: 1.2rem; margin-bottom: 30px; }
+            .btn { 
+                display: inline-block; 
+                padding: 15px 30px; 
+                background: white; 
+                color: #667eea; 
+                text-decoration: none; 
+                border-radius: 10px; 
+                font-weight: bold; 
+                transition: transform 0.2s;
+            }
+            .btn:hover { transform: translateY(-2px); }
+            .links { margin-top: 30px; }
+            .links a { 
+                color: white; 
+                text-decoration: none; 
+                margin: 0 15px; 
+                opacity: 0.8;
+            }
+            .links a:hover { opacity: 1; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🚀 AI Code Review Assistant</h1>
+            <p>Welcome to your comprehensive Python code analysis tool!</p>
+            <a href="/ui" class="btn">Launch Web Interface</a>
+            <div class="links">
+                <a href="/docs">API Documentation</a> |
+                <a href="/ui">Web UI</a> |
+                <a href="/test">Test Endpoint</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return HTMLResponse(content=welcome_html)
 
 @app.get("/test")
 async def test_endpoint():
